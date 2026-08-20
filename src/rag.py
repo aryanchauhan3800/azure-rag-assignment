@@ -2,6 +2,7 @@ import argparse
 import sys
 from src.retrieval.search import retrieve_documents
 from src.generation.chat import generate_answer
+from src.generation.router import is_conversational, get_conversational_response
 
 def main():
     parser = argparse.ArgumentParser(description="End-to-End Azure RAG Application")
@@ -9,6 +10,14 @@ def main():
     parser.add_argument("--top_k", type=int, default=3, help="Number of chunks to retrieve for context")
     args = parser.parse_args()
     
+    if is_conversational(args.query):
+        print(f"\n[1] Query routed as conversational: '{args.query}'")
+        print("\n" + "="*50)
+        print("ANSWER:")
+        print(get_conversational_response())
+        print("="*50 + "\n")
+        return
+        
     print(f"\n[1] Retrieving relevant documents for query: '{args.query}'...")
     try:
         chunks = retrieve_documents(args.query, top_k=args.top_k)
