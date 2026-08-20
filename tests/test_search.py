@@ -47,3 +47,4 @@ def test_retrieve_documents(mock_env_get, mock_get_openai, mock_get_search):
     args, kwargs = mock_search_client.search.call_args
     assert len(kwargs["vector_queries"]) == 1
     assert kwargs["vector_queries"][0].k_nearest_neighbors == 2
+    assert kwargs["search_text"] == "query" # Default is hybrid

@@ -1,0 +1,37 @@
+[
+    {
+        "id": "q1",
+        "question": "What is the travel meal limit?",
+        "expected_source_document": "TravelPolicy.docx",
+        "expected_answer_snippet": "$100",
+        "is_in_scope": true
+    },
+    {
+        "id": "q2",
+        "question": "What is the client meal limit?",
+        "expected_source_document": "ExpensePolicy.pdf",
+        "expected_answer_snippet": "$100",
+        "is_in_scope": true
+    },
+    {
+        "id": "q3",
+        "question": "What approval is required above the expense limit for team meals?",
+        "expected_source_document": "ExpensePolicy.pdf",
+        "expected_answer_snippet": "Manager",
+        "is_in_scope": true
+    },
+    {
+        "id": "q4",
+        "question": "What is the company policy on bringing pets to the office?",
+        "expected_source_document": null,
+        "expected_answer_snippet": "I could not find this information",
+        "is_in_scope": false
+    },
+    {
+        "id": "q5",
+        "question": "What is the code of conduct for remote work?",
+        "expected_source_document": null,
+        "expected_answer_snippet": "I could not find this information",
+        "is_in_scope": false
+    }
+]

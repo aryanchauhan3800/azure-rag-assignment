@@ -32,9 +32,13 @@ def retrieve_documents(query: str, top_k: int = 3) -> List[Dict[str, Any]]:
         fields="embedding"
     )
     
+    # 3. Determine Search Mode
+    search_mode = os.environ.get("SEARCH_MODE", "hybrid").lower()
+    search_text = query if search_mode == "hybrid" else None
+    
     # Execute the search
     results = search_client.search(
-        search_text=None,
+        search_text=search_text,
         vector_queries=[vector_query],
         select=["id", "document_name", "department", "source_metadata", "text"]
     )
