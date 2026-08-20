@@ -1,0 +1,9 @@
+pymupdf
+langchain-text-splitters
+python-docx
+openpyxl
+pytest
+azure-search-documents>=11.4.0
+azure-core
+openai
+python-dotenv
