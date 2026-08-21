@@ -5,6 +5,18 @@ A portfolio-quality Retrieval-Augmented Generation (RAG) pipeline built with Pyt
 ## 1. Project Overview
 This project ingests company documents (PDFs, DOCX, XLSX) and builds a fully functional RAG system allowing users to query information conversationally. It incorporates strong anti-hallucination guardrails and intelligent query routing.
 
+## Demo
+Here are screenshots of the actual working project:
+
+### Streamlit UI
+![Streamlit RAG UI](docs/images/streamlit-ui.png)
+
+### RAG CLI Output
+![RAG CLI](docs/images/rag-cli.png)
+
+### Automated Evaluation & Tests
+![Evaluation and Tests](docs/images/evaluation-tests.png)
+
 ## 2. Architecture
 ```text
 Documents
@@ -107,7 +119,7 @@ PYTHONPATH=. .venv/bin/python evaluation/evaluate.py
 
 ## 15. Testing & 16. GitHub Actions CI
 Unit tests execute locally and are fully mocked to prevent unexpected Azure costs.
-- **Verified Results**: 11/11 unit tests passed.
+- **Verified Results**: 14/14 unit tests passed.
 ```bash
 PYTHONPATH=. .venv/bin/python -m pytest
 ```
