@@ -40,7 +40,8 @@ def retrieve_documents(query: str, top_k: int = 3) -> List[Dict[str, Any]]:
     results = search_client.search(
         search_text=search_text,
         vector_queries=[vector_query],
-        select=["id", "document_name", "department", "source_metadata", "text"]
+        select=["id", "document_name", "department", "source_metadata", "text"],
+        top=top_k
     )
     
     docs = []

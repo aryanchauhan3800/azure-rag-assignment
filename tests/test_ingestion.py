@@ -27,6 +27,14 @@ def test_data_dir(tmp_path):
     docx_path = data_dir / "HR" / "LeavePolicy.docx"
     doc_word = docx.Document()
     doc_word.add_paragraph("This is the leave policy for Northwind Traders. " * 50)
+    
+    # Add a dummy table
+    table = doc_word.add_table(rows=2, cols=2)
+    table.cell(0, 0).text = "Table Header 1"
+    table.cell(0, 1).text = "Table Header 2"
+    table.cell(1, 0).text = "Table Cell 1"
+    table.cell(1, 1).text = "Table Cell 2"
+    
     doc_word.save(str(docx_path))
 
     # Create a dummy XLSX in Sales
@@ -56,7 +64,7 @@ def test_process_pdf(test_data_dir):
 
 def test_process_docx(test_data_dir):
     docx_path = os.path.join(test_data_dir, "HR", "LeavePolicy.docx")
-    chunks = process_document(docx_path, "HR", chunk_size=150, chunk_overlap=20)
+    chunks = process_document(docx_path, "HR", chunk_size=1500, chunk_overlap=20)
     
     assert len(chunks) > 0
     first_chunk = chunks[0]
@@ -64,6 +72,12 @@ def test_process_docx(test_data_dir):
     assert first_chunk["department"] == "HR"
     assert first_chunk["page_number"] == 1
     assert first_chunk["chunk_id"].startswith("LeavePolicy.docx_HR_p1_c")
+    
+    # Verify table content was extracted
+    chunk_texts = [c["text"] for c in chunks]
+    full_text = "\n".join(chunk_texts)
+    assert "Table Header 1 | Table Header 2" in full_text
+    assert "Table Cell 1 | Table Cell 2" in full_text
 
 def test_process_xlsx(test_data_dir):
     xlsx_path = os.path.join(test_data_dir, "Sales", "Pricing.xlsx")

@@ -45,6 +45,12 @@ def run_evaluation(questions_file: str):
             
         # 3. Validation
         if q["expected_answer_snippet"].lower() in answer.lower():
+            # Check for incorrect cross-contamination specifically for travel meal limit
+            if q["id"] == "q1" and "travel meal limit is $100" in answer.lower():
+                print(f"  [X] Failed: Answer incorrectly claims the travel meal limit is $100.")
+                print(f"      Actual Answer: {answer}")
+                continue
+                
             print(f"  [+] Generation success: Output contains expected snippet '{q['expected_answer_snippet']}'")
             passed += 1
         else:

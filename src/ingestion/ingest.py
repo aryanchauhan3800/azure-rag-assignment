@@ -32,7 +32,18 @@ def process_docx(file_path: str, department: str, chunk_size: int, chunk_overlap
     pages_data = []
     try:
         doc = docx.Document(file_path)
-        text = "\n".join([para.text for para in doc.paragraphs if para.text.strip()])
+        
+        text_elements = [para.text for para in doc.paragraphs if para.text.strip()]
+        
+        # Extract tables
+        for table in doc.tables:
+            for row in table.rows:
+                # Use a separator and filter out empty cells
+                row_text = " | ".join([cell.text.strip().replace("\n", " ") for cell in row.cells if cell.text.strip()])
+                if row_text:
+                    text_elements.append(row_text)
+                    
+        text = "\n".join(text_elements)
         if text.strip():
             pages_data.append({
                 "page_number": 1,  # Treat docx as a single long page

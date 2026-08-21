@@ -20,8 +20,10 @@ for message in st.session_state.messages:
         if "sources" in message and message["sources"]:
             with st.expander("View Sources"):
                 for idx, source in enumerate(message["sources"], 1):
-                    st.markdown(f"**[{idx}] {source['document_name']}** (Score: {source['score']:.4f})")
-                    st.markdown(f"*Metadata:* {source['metadata']}")
+                    chunk_count = source.get('chunk_count', 1)
+                    chunk_text = f"({chunk_count} relevant chunk{'s' if chunk_count > 1 else ''})"
+                    st.markdown(f"**[{idx}] {source['document_name']}** {chunk_text}")
+                    st.markdown(f"*Best Score:* {source['score']:.4f} | *Metadata:* {source['metadata']}")
 
 # React to user input
 if prompt := st.chat_input("Ask a question about the documents..."):
@@ -58,8 +60,10 @@ if prompt := st.chat_input("Ask a question about the documents..."):
                         if sources:
                             with st.expander("View Sources"):
                                 for idx, source in enumerate(sources, 1):
-                                    st.markdown(f"**[{idx}] {source['document_name']}** (Score: {source['score']:.4f})")
-                                    st.markdown(f"*Metadata:* {source['metadata']}")
+                                    chunk_count = source.get('chunk_count', 1)
+                                    chunk_text = f"({chunk_count} relevant chunk{'s' if chunk_count > 1 else ''})"
+                                    st.markdown(f"**[{idx}] {source['document_name']}** {chunk_text}")
+                                    st.markdown(f"*Best Score:* {source['score']:.4f} | *Metadata:* {source['metadata']}")
                                     
                         st.session_state.messages.append({"role": "assistant", "content": answer, "sources": sources})
                     except Exception as e:

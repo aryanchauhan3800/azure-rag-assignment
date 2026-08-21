@@ -3,7 +3,7 @@
         "id": "q1",
         "question": "What is the travel meal limit?",
         "expected_source_document": "TravelPolicy.docx",
-        "expected_answer_snippet": "$100",
+        "expected_answer_snippet": "$45",
         "is_in_scope": true
     },
     {

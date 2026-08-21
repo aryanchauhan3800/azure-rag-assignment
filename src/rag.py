@@ -37,9 +37,12 @@ def main():
         print("\n" + "="*50)
         print("ANSWER:")
         print(answer)
-        print("\nSOURCES:")
-        for source in sources:
-            print(f"- Doc: {source['document_name']} | Meta: {source['metadata']} | Score: {source['score']:.4f}")
+        if sources:
+            print("\nSOURCES:")
+            for source in sources:
+                chunk_count = source.get('chunk_count', 1)
+                chunk_text = f"({chunk_count} relevant chunk{'s' if chunk_count > 1 else ''})"
+                print(f"- Doc: {source['document_name']} {chunk_text} | Meta: {source['metadata']} | Best Score: {source['score']:.4f}")
         print("="*50 + "\n")
     except Exception as e:
         print(f"Generation Error: {e}")

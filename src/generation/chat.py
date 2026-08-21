@@ -13,29 +13,45 @@ def generate_answer(query: str, retrieved_chunks: List[Dict[str, Any]]) -> Tuple
         
     client = get_openai_client()
     
-    # Build context
+    # Build context and group sources
     context_text = ""
-    sources = []
+    source_map = {}
+    
     for i, chunk in enumerate(retrieved_chunks, 1):
-        context_text += f"\n--- Document {i}: {chunk.get('document_name', 'Unknown')} ({chunk.get('department', 'Unknown')}) ---\n"
+        doc_name = chunk.get('document_name', 'Unknown')
+        context_text += f"\n--- Document {i}: {doc_name} ({chunk.get('department', 'Unknown')}) ---\n"
         context_text += chunk.get('text', '') + "\n"
         
-        source_info = {
-            "document_name": chunk.get('document_name', 'Unknown'),
-            "metadata": chunk.get('source_metadata', 'N/A'),
-            "score": chunk.get('score', 0.0)
-        }
-        if source_info not in sources:
-            sources.append(source_info)
+        score = chunk.get('score', 0.0)
+        meta = chunk.get('source_metadata', 'N/A')
+        
+        if doc_name not in source_map:
+            source_map[doc_name] = {
+                "document_name": doc_name,
+                "metadata": meta,
+                "score": score,
+                "chunk_count": 1
+            }
+        else:
+            source_map[doc_name]["chunk_count"] += 1
+            # Keep the max score and its associated metadata
+            if score > source_map[doc_name]["score"]:
+                source_map[doc_name]["score"] = score
+                source_map[doc_name]["metadata"] = meta
+                
+    sources = list(source_map.values())
             
     system_prompt = (
         "You are an assistant answering questions based strictly on the provided company documents. "
         "Your instructions:\n"
         "- Answer ONLY using the provided context.\n"
-        "- If the answer is not present in the context, say:\n"
+        "- Prioritize the document/chunk that directly answers the user's specific question.\n"
+        "- Do NOT combine different policy categories (e.g. Travel Policy vs Expense/Client Policy) unless the user explicitly asks for a comparison.\n"
+        "- If retrieved documents contain related but different policies, do not merge them into one answer. Answer based only on the specific policy requested.\n"
+        "- Do not include limits or values from unrelated policies in your answer.\n"
+        "- If the answer is not present in the context, say exactly:\n"
         "'I could not find this information in the provided documents.'\n"
-        "- Do not invent facts.\n"
-        "- Do not use prior knowledge outside the provided context."
+        "- Do not invent facts or infer values from related policies."
     )
     
     user_prompt = f"Context Documents:\n{context_text}\n\nUser Question: {query}\n\nAnswer the question using the context above:"
@@ -50,6 +66,10 @@ def generate_answer(query: str, retrieved_chunks: List[Dict[str, Any]]) -> Tuple
             temperature=0.0
         )
         answer = response.choices[0].message.content
+        
+        if "I could not find this information" in answer:
+            sources = []
+            
         return answer, sources
     except Exception as e:
         raise RuntimeError(f"Chat API Error: Failed to generate answer using deployment '{deployment_name}'. Error: {e}")
