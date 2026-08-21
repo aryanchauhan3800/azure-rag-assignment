@@ -1,5 +1,5 @@
 # Azure RAG Assignment
-
+[![Tests](https://github.com/aryanchauhan3800/azure-rag-assignment/actions/workflows/tests.yml/badge.svg)](https://github.com/aryanchauhan3800/azure-rag-assignment/actions/workflows/tests.yml)
 A portfolio-quality Retrieval-Augmented Generation (RAG) pipeline built with Python, Azure OpenAI, and Azure AI Search. Features Streamlit UI, hybrid search query routing, automated evaluation, and CI/CD via GitHub Actions.
 
 ## 1. Project Overview
@@ -62,7 +62,15 @@ Grounded Answer & Sources
 - `evaluation/`: Automated RAG evaluation dataset and runner.
 - `tests/`: Fully mocked unit test suite.
 
-## 6. Setup Instructions
+## 6. Key Engineering Decisions
+- **Hybrid Retrieval**: Combines vector similarity (HNSW) with BM25 keyword search to maximize recall.
+- **Query Routing**: A lightweight router intercepts conversational queries (e.g., "Hello") to avoid unnecessary Azure Search calls and reduce latency.
+- **Strict Grounding**: System prompts explicitly constrain the LLM to only answer based on retrieved context, ensuring it refuses unsupported queries rather than hallucinating.
+- **Mocked Unit Tests**: The Pytest suite entirely mocks Azure AI SDKs, allowing GitHub Actions CI to validate logic without requiring actual cloud credentials or incurring costs.
+- **Live Evaluation**: A deterministic evaluation suite uses actual Azure resources to validate end-to-end RAG retrieval, factual generation, and refusal behavior.
+- **Semantic Reranking Deferred**: While Azure AI Search offers Semantic Ranker, it is documented as a future enhancement rather than being artificially implemented with heavyweight local models.
+
+## 7. Setup Instructions
 1. Setup a Python virtual environment and install dependencies:
    ```bash
    python3 -m venv .venv
@@ -71,7 +79,7 @@ Grounded Answer & Sources
    ```
 2. Configure your Azure variables in a `.env` file (see `.env.example` for reference). **DO NOT commit `.env`.**
 
-## 7. Environment Variables
+## 8. Environment Variables
 Requires an Azure AI Search instance and an Azure OpenAI resource with both an embedding deployment and a chat deployment.
 ```env
 AZURE_SEARCH_ENDPOINT="https://<your-service>.search.windows.net"
@@ -86,38 +94,38 @@ AZURE_OPENAI_CHAT_DEPLOYMENT="gpt-4.1-mini"
 SEARCH_MODE="hybrid"
 ```
 
-## 8. Document Ingestion & 9. Indexing
+## 9. Document Ingestion & 10. Indexing
 Run this when data changes to parse the `data/` directory and synchronize chunks with Azure AI Search:
 ```bash
 .venv/bin/python src/retrieval/indexer.py
 ```
 
-## 10. Hybrid Retrieval & 11. RAG Generation
+## 11. Hybrid Retrieval & 12. RAG Generation
 Ask questions via the terminal to trigger the complete pipeline:
 ```bash
 PYTHONPATH=. .venv/bin/python src/rag.py "What is the travel meal limit?"
 ```
 
-## 12. Grounded Refusal Behavior
+## 13. Grounded Refusal Behavior
 The pipeline will safely refuse questions not supported by the data:
 ```bash
 PYTHONPATH=. .venv/bin/python src/rag.py "What is the company policy on bringing pets to the office?"
 ```
 
-## 13. Streamlit Usage
+## 14. Streamlit Usage
 Launch the interactive web interface:
 ```bash
 .venv/bin/streamlit run app.py
 ```
 
-## 14. Evaluation
+## 15. Evaluation
 A lightweight evaluation framework tests retrieval accuracy and groundedness on real Azure services against a ground-truth dataset.
 - **Verified Results**: 5/5 live evaluation cases passed.
 ```bash
 PYTHONPATH=. .venv/bin/python evaluation/evaluate.py
 ```
 
-## 15. Testing & 16. GitHub Actions CI
+## 16. Testing & 17. GitHub Actions CI
 Unit tests execute locally and are fully mocked to prevent unexpected Azure costs.
 - **Verified Results**: 14/14 unit tests passed.
 ```bash
@@ -125,13 +133,13 @@ PYTHONPATH=. .venv/bin/python -m pytest
 ```
 GitHub Actions is configured (`.github/workflows/tests.yml`) to automatically run the test suite on pushes and PRs to `main`.
 
-## 17. Security
+## 18. Security
 - The `.env` file containing API keys is ignored by Git (`.gitignore`).
 - Code defensively handles missing configuration.
 - CI pipelines use mocked services, preventing credential leaks.
 
-## 18. Limitations
+## 19. Limitations
 - Azure AI Search index requires manual schema management and update scripts when metadata structures change.
 
-## 19. Future Improvements
+## 20. Future Improvements
 - **Semantic Reranking**: Azure AI Search offers a native Semantic Ranker. This is currently deferred as a future enhancement because it requires specific Azure service tiers (Standard) and enabling semantic configurations on the index, which incurs extra infrastructure setup and costs outside this project's scope.
